@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.lucene.demo;
 
 
@@ -44,15 +28,11 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-// ##************************* for parser and tokenize *************************##
+// ##************************* libraries for parser and tokenize *************************##
 import org.apache.lucene.benchmark.byTask.feeds.DemoHTMLParser;
 import java.io.ByteArrayInputStream;
 
-/** Index all text files under a directory.
- * <p>
- * This is a command-line application demonstrating simple Lucene indexing.
- * Run it with no command-line arguments for usage information.
- */
+
 public class HtmlIndexFiles {
   
   private HtmlIndexFiles() {}
@@ -94,6 +74,10 @@ public class HtmlIndexFiles {
       System.out.println("Indexing to directory '" + indexPath + "'...");
 
       Directory dir = FSDirectory.open(Paths.get(indexPath));
+
+      // Initialize an analyzer so that it can later:
+      // convert created tokens to lowercase
+      // and filter out based on a predefined list of stop-words
       Analyzer analyzer = new StandardAnalyzer();
       IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
@@ -106,22 +90,8 @@ public class HtmlIndexFiles {
         iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
       }
 
-      // Optional: for better indexing performance, if you
-      // are indexing many documents, increase the RAM
-      // buffer.  But if you do this, increase the max heap
-      // size to the JVM (eg add -Xmx512m or -Xmx1g):
-      //
-      // iwc.setRAMBufferSizeMB(256.0);
-
       IndexWriter writer = new IndexWriter(dir, iwc);
       indexDocs(writer, docDir);
-      // NOTE: if you want to maximize search performance,
-      // you can optionally call forceMerge here.  This can be
-      // a terribly costly operation, so generally it's only
-      // worth it when your index is relatively static (ie
-      // you're done adding documents to it):
-      //
-      // writer.forceMerge(1);
 
       writer.close();
 
@@ -201,7 +171,6 @@ public class HtmlIndexFiles {
       System.out.println("contents:" + parser.body);
 
       // After parsing, use standard analyzers to create tokens from the result of parser
-      // then, convert them to lowercase then filter out based on a predefined list of stop-words (this is done by the Standard Analyzer)
       InputStream stream_title = new ByteArrayInputStream(parser.title.getBytes(StandardCharsets.UTF_8));
       InputStream stream_body = new ByteArrayInputStream(parser.body.getBytes(StandardCharsets.UTF_8));
       doc.add(new TextField("title", new BufferedReader(new InputStreamReader(stream_title, StandardCharsets.UTF_8))));

@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.lucene.demo;
 
 
@@ -49,7 +33,6 @@ import org.apache.lucene.benchmark.byTask.feeds.DemoHTMLParser;
 import java.io.ByteArrayInputStream;
 import org.apache.lucene.analysis.standard.CMPT456Analyzer;
 import org.apache.lucene.search.similarities.CMPT456Similarity;
-// import org.apache.lucene.index.IndexWriterConfig.setSimilarity;
 
 /** Index all text files under a directory.
  * <p>
@@ -97,10 +80,9 @@ public class TFIDFHtmlIndexFiles {
       System.out.println("Indexing to directory '" + indexPath + "'...");
 
       Directory dir = FSDirectory.open(Paths.get(indexPath));
-      // Analyzer analyzer = new StandardAnalyzer();
       Analyzer analyzer = new CMPT456Analyzer();
       IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-
+      // use CMPT456Similarity for indexing process. 
       CMPT456Similarity similarity = new CMPT456Similarity();
       iwc.setSimilarity(similarity);
 
@@ -113,22 +95,8 @@ public class TFIDFHtmlIndexFiles {
         iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
       }
 
-      // Optional: for better indexing performance, if you
-      // are indexing many documents, increase the RAM
-      // buffer.  But if you do this, increase the max heap
-      // size to the JVM (eg add -Xmx512m or -Xmx1g):
-      //
-      // iwc.setRAMBufferSizeMB(256.0);
-
       IndexWriter writer = new IndexWriter(dir, iwc);
       indexDocs(writer, docDir);
-      // NOTE: if you want to maximize search performance,
-      // you can optionally call forceMerge here.  This can be
-      // a terribly costly operation, so generally it's only
-      // worth it when your index is relatively static (ie
-      // you're done adding documents to it):
-      //
-      // writer.forceMerge(1);
 
       writer.close();
 
@@ -204,7 +172,7 @@ public class TFIDFHtmlIndexFiles {
       // Construct a HTML parser
       DemoHTMLParser.Parser parser = new DemoHTMLParser.Parser(new InputStreamReader(stream));
 
-      // After parsing, use standard analyzers to create tokens from the result of parser
+      // After parsing, use CMPT456 analyzer to create tokens from the result of parser
       // then, convert them to lowercase then filter out based on a predefined list of stop-words (this is done by the Standard Analyzer)
       InputStream stream_title = new ByteArrayInputStream(parser.title.getBytes(StandardCharsets.UTF_8));
       InputStream stream_body = new ByteArrayInputStream(parser.body.getBytes(StandardCharsets.UTF_8));

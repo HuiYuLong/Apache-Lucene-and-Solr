@@ -1,6 +1,3 @@
-docker stop Project1
-echo 'stop the container'
-
 sudo docker cp ./lucene/demo/data/wiki-small/en/test.html Project1:/lucene-solr/lucene/demo/data/wiki-small/en/
 sudo docker cp ./lucene/demo/build.xml Project1:/lucene-solr/lucene/demo/
 

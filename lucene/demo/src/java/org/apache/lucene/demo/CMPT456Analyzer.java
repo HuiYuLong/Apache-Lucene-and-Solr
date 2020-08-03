@@ -1,21 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.lucene.analysis.standard;
-
 
 import java.io.IOException;
 import java.io.Reader;
@@ -50,6 +33,7 @@ public final class CMPT456Analyzer extends StopwordAnalyzerBase {
   
   static {
 
+    // Read from the custom stopwords list
     List<String> data = new ArrayList<String>();
     try {
         File myObj = new File("lucene/demo/src/java/org/apache/lucene/demo/stopwords.txt");
@@ -62,18 +46,8 @@ public final class CMPT456Analyzer extends StopwordAnalyzerBase {
         System.out.println("An error occurred.");
         e.printStackTrace();
       }
-      
-    // final List<String> stopWords = Arrays.asList(
-    //   "a", "an", "and", "are", "as", "at", "be", "but", "by",
-    //   "for", "if", "in", "into", "is", "it",
-    //   "no", "not", "of", "on", "or", "such",
-    //   "that", "the", "their", "then", "there", "these",
-    //   "they", "this", "to", "was", "will", "with"
-    // );
-    // System.out.println("original:" + stopWords);
-    final List<String> stopWords = data;
 
-    // System.out.println("stopwords:" + stopWords);
+    final List<String> stopWords = data;
     final CharArraySet stopSet = new CharArraySet(stopWords, false);
     ENGLISH_STOP_WORDS_SET = CharArraySet.unmodifiableSet(stopSet); 
   }
@@ -129,9 +103,10 @@ public final class CMPT456Analyzer extends StopwordAnalyzerBase {
     final StandardTokenizer src = new StandardTokenizer();
     src.setMaxTokenLength(maxTokenLength);
     TokenStream tok = new StandardFilter(src);
+    // Convert tokens to lowercase then filter out based on our custom stopwords list 
     tok = new LowerCaseFilter(tok);
     tok = new StopFilter(tok, stopwords);
-
+    // Use a Porter stemmer for stemming
     return new TokenStreamComponents(src, new PorterStemFilter(tok)) {
       @Override
       protected void setReader(final Reader reader) {
@@ -147,7 +122,6 @@ public final class CMPT456Analyzer extends StopwordAnalyzerBase {
   protected TokenStream normalize(String fieldName, TokenStream in) {
     TokenStream result = new StandardFilter(in);
     result = new LowerCaseFilter(result);
-    result = new PorterStemFilter(result);
     return result;
   }
 }
